@@ -3,7 +3,7 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
-st.set_page_config(page_title="🤖 Meu Chatbot com Gemini", page_icon="🤖", layout="centered")
+st.set_page_config(page_title="🤖 Meu Agente de IA com Memória", page_icon="🤖", layout="centered")
 
 load_dotenv()
 
@@ -25,7 +25,6 @@ def load_model():
         "SEXUAL": "BLOCK_NONE",
         "DANGEROUS": "BLOCK_NONE",
     }
-
     model = genai.GenerativeModel(
         model_name="gemini-1.5-pro-latest",
         generation_config=generation_config,
@@ -35,24 +34,38 @@ def load_model():
 
 model = load_model()
 
+user_avatar = "👤"
+ai_avatar = "🤖"
+
+with st.sidebar:
+    st.title("Opções")
+    if st.button("Limpar Histórico da Conversa"):
+        st.session_state.chat = model.start_chat(history=[])
+        st.rerun()
+
 st.title("Meu Agente de IA com Memória")
 st.caption("Desenvolvido com Gemini, Python e Streamlit")
 
 if "chat" not in st.session_state:
     st.session_state.chat = model.start_chat(history=[])
 
+if not st.session_state.chat.history:
+    with st.chat_message("assistant", avatar=ai_avatar):
+        st.write("Olá! Sou seu agente de IA. Como posso te ajudar hoje?")
+
 for message in st.session_state.chat.history:
-    role = "Você" if message.role == "user" else "IA"
-    with st.chat_message(role):
+    role = "user" if message.role == "user" else "assistant"
+    with st.chat_message(role, avatar=(user_avatar if role == "user" else ai_avatar)):
         st.markdown(message.parts[0].text)
 
 if prompt := st.chat_input("Digite sua mensagem..."):
-    with st.chat_message("Você"):
+    with st.chat_message("user", avatar=user_avatar):
         st.markdown(prompt)
 
     try:
-        response = st.session_state.chat.send_message(prompt)
-        with st.chat_message("IA"):
-            st.markdown(response.text)
+        with st.chat_message("assistant", avatar=ai_avatar):
+            response_container = st.empty()
+            response_stream = st.session_state.chat.send_message(prompt, stream=True)
+            response_container.write_stream(response_stream)
     except Exception as e:
         st.error(f"Ocorreu um erro: {e}")
