@@ -5,28 +5,15 @@ from dotenv import load_dotenv
 
 st.set_page_config(page_title="🤖 Meu Chatbot com Gemini", page_icon="🤖", layout="centered")
 
-st.write("1. Script iniciado. Imports concluídos.")
-
 load_dotenv()
 
-st.write("2. Tentando ler a chave de API do ambiente.")
-
-api_key = os.environ.get("GOOGLE_API_KEY")
-
-if not api_key:
-    st.error("Chave de API do Google não encontrada nos Secrets! Por favor, configure-a.")
-    st.write("3. ERRO: Chave de API não encontrada. Parando a execução.")
-    st.stop()
-else:
-    st.write("3. SUCESSO: Chave de API encontrada.")
-
 try:
-    st.write("4. Configurando a biblioteca GenAI...")
-    genai.configure(api_key=api_key)
-    st.write("5. SUCESSO: Biblioteca GenAI configurada.")
+    genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
+except AttributeError:
+    st.error("Chave de API do Google não encontrada! Por favor, configure os Secrets.")
+    st.stop()
 except Exception as e:
-    st.error(f"Ocorreu um erro ao configurar a biblioteca GenAI: {e}")
-    st.write("5. ERRO: Falha na configuração da GenAI. Parando a execução.")
+    st.error(f"Ocorreu um erro ao configurar a API: {e}")
     st.stop()
 
 def load_model():
@@ -47,7 +34,6 @@ def load_model():
         safety_settings=safety_settings
     )
     return model
-
 
 model = load_model()
 
