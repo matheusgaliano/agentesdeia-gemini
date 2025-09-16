@@ -7,14 +7,12 @@ st.set_page_config(page_title="🤖 Meu Chatbot com Gemini", page_icon="🤖", l
 
 load_dotenv()
 
-try:
-    genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
-except AttributeError:
+api_key = os.environ.get("GOOGLE_API_KEY")
+if not api_key:
     st.error("Chave de API do Google não encontrada! Por favor, configure os Secrets.")
     st.stop()
-except Exception as e:
-    st.error(f"Ocorreu um erro ao configurar a API: {e}")
-    st.stop()
+else:
+    genai.configure(api_key=api_key)
 
 def load_model():
     generation_config = {
