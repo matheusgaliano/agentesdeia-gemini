@@ -48,6 +48,7 @@ def load_model():
     )
     return model
 
+
 model = load_model()
 
 st.title("Meu Agente de IA com Memória")
