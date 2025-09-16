@@ -3,10 +3,8 @@ title: Agentesia Gemini Chatbot
 emoji: 🤖
 colorFrom: red
 colorTo: red
-sdk: docker
-app_port: 8501
-tags:
-  - streamlit
+sdk: streamlit
+app_file: app.py
 pinned: false
 short_description: Projeto com agentes de inteligência artificial.
 license: mit
